@@ -15,7 +15,7 @@ namespace TelemetryAppInsights.Samples
             this.listener.Start();
             Task.Run(() =>
             {
-                using var source = new ActivitySource("Simcorp.Samples.SampleServer");
+                using var source = new ActivitySource("Telemetry.Samples.SampleServer");
                 while(this.listener.IsListening)
                 {
                     try

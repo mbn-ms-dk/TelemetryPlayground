@@ -17,7 +17,7 @@ namespace TelemetryAppInsights.Samples
 
             this.requestTask = Task.Run(async () =>
             {
-                using var source = new ActivitySource("Simcorp.Samples.SampleClient");
+                using var source = new ActivitySource("Telemetry.Samples.SampleClient");
                 using var client = new HttpClient();
 
                 var count = 1;

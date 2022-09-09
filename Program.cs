@@ -1,40 +1,43 @@
 ﻿using Azure.Communication;
 using Azure.Communication.Identity;
 using Azure.Monitor.OpenTelemetry.Exporter;
+using Microsoft.Extensions.Configuration;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Reflection;
 using TelemetryAppInsights.Samples;
 
 namespace TelemetryAppInsights
 {
     class Program
     {
-        private static readonly ActivitySource source = new("Simcorp.AzureMonitor.Demo");
+        private static readonly ActivitySource source = new("Telemetry.AzureMonitor.Demo");
         static async Task Main(string[] args)
         {
             var resourceAttributes = new Dictionary<string, object> { 
-                { "service.name", "SimcorpDemo" }, 
+                { "service.name", "TelemetryDemo" }, 
                 { "service.instance.id", "AdvancedService" }, 
-                { "service.namespace", "Simcorp.TelemetryAppInsights" } 
+                { "service.namespace", "Telemetry.TelemetryAppInsights" } 
             };
 
             var resourceBuilder = ResourceBuilder.CreateDefault().AddAttributes(resourceAttributes);
 
+
             using var tracerProvider = OpenTelemetry.Sdk.CreateTracerProviderBuilder()
                 .SetResourceBuilder(resourceBuilder)
-                .AddSource("Simcorp.AzureMonitor.Demo")
+                .AddSource("Telemetry.AzureMonitor.Demo")
                 .AddSource("IdentityTelemetry")
-                .AddSource("Simcorp.Samples.SampleServer")
-                .AddSource("Simcorp.Samples.SampleClient")
+                .AddSource("Telemetry.Samples.SampleServer")
+                .AddSource("Telemetry.Samples.SampleClient")
                 .AddSource("CustomTestActivity")
                 .AddProcessor(new ActivityEnrichingProcessor())
                 .AddProcessor(new ActivityFilteringProcessor())
                 //.AddConsoleExporter()
                 .AddAzureMonitorTraceExporter(o =>
                 {
-                    o.ConnectionString = "InstrumentationKey=7327571a-eb96-4ee3-a318-d3459c2d8d9f;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/";//Environment.GetEnvironmentVariable("APPLICATION_INSIGHTS_CONNECTION_STRING");
+                    o.ConnectionString = Settings();
                 })
                 .AddZipkinExporter(z =>
                 {
@@ -75,6 +78,17 @@ namespace TelemetryAppInsights
 
             Console.WriteLine("Press Enter key to exit.");
             Console.ReadLine();
+        }
+
+        private static string Settings()
+        {
+            var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile($"application.json");
+
+            var config = configuration.Build();
+            var connectionString = config["AppInsights"];
+            return connectionString;
         }
     }
 }
