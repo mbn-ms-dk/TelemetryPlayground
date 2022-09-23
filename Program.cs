@@ -28,13 +28,12 @@ namespace TelemetryAppInsights
             using var tracerProvider = OpenTelemetry.Sdk.CreateTracerProviderBuilder()
                 .SetResourceBuilder(resourceBuilder)
                 .AddSource("Telemetry.AzureMonitor.Demo")
-                .AddSource("IdentityTelemetry")
                 .AddSource("Telemetry.Samples.SampleServer")
                 .AddSource("Telemetry.Samples.SampleClient")
                 .AddSource("CustomTestActivity")
-                .AddProcessor(new ActivityEnrichingProcessor())
-                .AddProcessor(new ActivityFilteringProcessor())
-                //.AddConsoleExporter()
+                //.AddProcessor(new ActivityEnrichingProcessor())
+                //.AddProcessor(new ActivityFilteringProcessor())
+                .AddConsoleExporter()
                 .AddAzureMonitorTraceExporter(o =>
                 {
                     o.ConnectionString = Settings();
@@ -60,11 +59,11 @@ namespace TelemetryAppInsights
                 })
                 .Build();
            
-            using (var activity = source.StartActivity("CustomTestActivity"))
+            using (var activity = source.StartActivity("CustomTestActivity", ActivityKind.Producer))
             {
                 activity?.SetTag("CustomTag1", $"Value1");
                 activity?.SetTag("CustomTag2", $"Value2");
-                using (var childSpan = source.StartActivity("ChildActivity", ActivityKind.Producer))
+                using (var childSpan = source.StartActivity("ChildActivity", ActivityKind.Internal))
                 {
                     childSpan?.AddEvent(new ActivityEvent("Add Baggage:Started"));
                     childSpan?.AddBaggage("Key", "Value");
@@ -72,9 +71,9 @@ namespace TelemetryAppInsights
                 }
             }
 
-
-            using var sample = new Orchestrator();
-            sample.Start();
+            //Start orchestration of sample server and sample client
+            //using var sample = new Orchestrator();
+            //sample.Start();
 
             Console.WriteLine("Press Enter key to exit.");
             Console.ReadLine();

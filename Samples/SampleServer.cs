@@ -37,7 +37,7 @@ namespace TelemetryAppInsights.Samples
                         activity?.SetTag("http.host", context.Request.Url?.Host);
 
                         string requestContent;
-                        using(var childSpan = source.StartActivity("ReadStream", ActivityKind.Consumer))
+                        using(var childSpan = source.StartActivity("ReadStream", ActivityKind.Client))
                         using(var reader = new StreamReader(context.Request.InputStream, context.Request.ContentEncoding))
                         {
                             requestContent = reader.ReadToEnd();

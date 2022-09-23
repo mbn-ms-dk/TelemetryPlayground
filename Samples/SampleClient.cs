@@ -23,7 +23,7 @@ namespace TelemetryAppInsights.Samples
                 var count = 1;
                 while(!cancellationToken.IsCancellationRequested)
                 {
-                    using (var cs = source.StartActivity("SetContent", ActivityKind.Consumer))
+                    using (var cs = source.StartActivity("SetContent", ActivityKind.Client))
                     {
                         cs?.AddEvent(new ActivityEvent("ContentWrite"));
                         var content = new StringContent($"client message: {DateTime.Now}", Encoding.UTF8);
