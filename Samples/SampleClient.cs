@@ -23,38 +23,33 @@ namespace TelemetryAppInsights.Samples
                 var count = 1;
                 while(!cancellationToken.IsCancellationRequested)
                 {
-                    using (var cs = source.StartActivity("SetContent", ActivityKind.Client))
+                    using var cs = source.StartActivity("SetContent", ActivityKind.Client);
+                    cs?.AddEvent(new ActivityEvent("ContentWrite"));
+                    var content = new StringContent($"client message: {DateTime.Now}", Encoding.UTF8);
+                    cs?.AddEvent(new ActivityEvent("ContentWriteDone"));
+
+
+                    using var activity = source.StartActivity("POST: " + RequestPath, ActivityKind.Client);
+                    count++;
+
+                    using var childSpan = source.StartActivity("PostAsync", ActivityKind.Consumer);
+                    childSpan?.AddEvent(new ActivityEvent("PostAsync:Started"));
+                    using var response = await client.PostAsync(url, content, cancellationToken).ConfigureAwait(false);
+                    childSpan?.AddEvent(new ActivityEvent("PostAsync:Ended"));
+
+                    activity?.SetTag("http.url", url);
+                    activity?.SetTag("http.status_code", $"{response.StatusCode:D}");
+
+                    var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    activity?.SetTag("response.content", responseContent);
+                    activity?.SetTag("response.length", responseContent.Length.ToString(CultureInfo.InvariantCulture));
+
+                    foreach (var header in response.Headers)
                     {
-                        cs?.AddEvent(new ActivityEvent("ContentWrite"));
-                        var content = new StringContent($"client message: {DateTime.Now}", Encoding.UTF8);
-                        cs?.AddEvent(new ActivityEvent("ContentWriteDone"));
-
-
-                        using (var activity = source.StartActivity("POST: " + RequestPath, ActivityKind.Client))
-                        {
-                            count++;
-                            using (var childSpan = source.StartActivity("PostAsync", ActivityKind.Consumer))
-                            {
-                                childSpan?.AddEvent(new ActivityEvent("PostAsync:Started"));
-                                using var response = await client.PostAsync(url, content, cancellationToken).ConfigureAwait(false);
-                                childSpan?.AddEvent(new ActivityEvent("PostAsync:Ended"));
-
-                                activity?.SetTag("http.url", url);
-                                activity?.SetTag("http.status_code", $"{response.StatusCode:D}");
-
-                                var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                                activity?.SetTag("response.content", responseContent);
-                                activity?.SetTag("response.length", responseContent.Length.ToString(CultureInfo.InvariantCulture));
-
-                                foreach (var header in response.Headers)
-                                {
-                                    if (header.Value is IEnumerable<object> enumerable)
-                                        activity?.SetTag($"http.header.{header.Key}", string.Join(",", enumerable));
-                                    else
-                                        activity?.SetTag($"http.header.{header.Key}", header.Value.ToString());
-                                }
-                            }
-                        }
+                        if (header.Value is IEnumerable<object> enumerable)
+                            activity?.SetTag($"http.header.{header.Key}", string.Join(",", enumerable));
+                        else
+                            activity?.SetTag($"http.header.{header.Key}", header.Value.ToString());
                     }
                 }
 
