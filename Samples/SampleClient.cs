@@ -32,9 +32,9 @@ namespace TelemetryAppInsights.Samples
                     using var activity = source.StartActivity("POST: " + RequestPath, ActivityKind.Client);
                     count++;
 
-                    using var childSpan = source.StartActivity("PostAsync", ActivityKind.Consumer);
+                    using var childSpan = source.StartActivity("PostAsync", ActivityKind.Client);
                     childSpan?.AddEvent(new ActivityEvent("PostAsync:Started"));
-                    using var response = await client.PostAsync(url, content, cancellationToken).ConfigureAwait(false);
+                    using var response = await client.PostAsync(url, content, cancellationToken);
                     childSpan?.AddEvent(new ActivityEvent("PostAsync:Ended"));
 
                     activity?.SetTag("http.url", url);
@@ -55,7 +55,7 @@ namespace TelemetryAppInsights.Samples
 
                 try
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
+                    await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
                 }
                 catch(TaskCanceledException)
                 {

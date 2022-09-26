@@ -3,26 +3,27 @@ using Microsoft.Extensions.Configuration;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System.Diagnostics;
+using TelemetryAppInsights;
 using TelemetryAppInsights.Samples;
 
 ActivitySource source = new("Telemetry.AzureMonitor.Demo");
 var resourceAttributes = new Dictionary<string, object> {
                 { "service.name", "TelemetryDemo" },
                 { "service.instance.id", "AdvancedService" },
-                { "service.namespace", "Telemetry.TelemetryAppInsights" }
+                { "service.namespace", "TelemetryAppInsights" }
             };
 
 var resourceBuilder = ResourceBuilder.CreateDefault().AddAttributes(resourceAttributes);
 
 using var tracerProvider = OpenTelemetry.Sdk.CreateTracerProviderBuilder()
     .SetResourceBuilder(resourceBuilder)
+    .AddSource("CustomTestActivity")
     .AddSource("Telemetry.AzureMonitor.Demo")
     .AddSource("Telemetry.Samples.SampleServer")
     .AddSource("Telemetry.Samples.SampleClient")
-    .AddSource("CustomTestActivity")
     //.AddProcessor(new ActivityEnrichingProcessor())
     //.AddProcessor(new ActivityFilteringProcessor())
-    .AddConsoleExporter() // Good idea to comment out when running the orchestrator part
+    .AddConsoleExporter()  //Good idea to comment out when running the orchestrator part
     .AddAzureMonitorTraceExporter(o =>
     {
         o.ConnectionString = Settings();
