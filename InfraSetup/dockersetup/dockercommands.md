@@ -2,7 +2,6 @@
 
 ## Jaeger
 ```
-
 docker run -d --name jaeger \
   -e COLLECTOR_ZIPKIN_HOST_PORT=:9411 \
   -e COLLECTOR_OTLP_ENABLED=true \
@@ -21,6 +20,5 @@ docker run -d --name jaeger \
 
 ## Zipkin
 ```
-
 docker run --rm -d -p 9411:9411 --name zipkin openzipkin/zipkin
 ```
