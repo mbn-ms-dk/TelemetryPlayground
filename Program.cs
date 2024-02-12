@@ -1,5 +1,6 @@
 ﻿using Azure.Monitor.OpenTelemetry.Exporter;
 using Microsoft.Extensions.Configuration;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System.Diagnostics;
@@ -15,14 +16,14 @@ var resourceAttributes = new Dictionary<string, object> {
 
 var resourceBuilder = ResourceBuilder.CreateDefault().AddAttributes(resourceAttributes);
 
-using var tracerProvider = OpenTelemetry.Sdk.CreateTracerProviderBuilder()
+using TracerProvider? tracerProvider = OpenTelemetry.Sdk.CreateTracerProviderBuilder()
     .SetResourceBuilder(resourceBuilder)
     .AddSource("CustomTestActivity")
     .AddSource("Telemetry.AzureMonitor.Demo")
     .AddSource("Telemetry.Samples.SampleServer")
     .AddSource("Telemetry.Samples.SampleClient")
-    //.AddProcessor(new ActivityEnrichingProcessor())
-    //.AddProcessor(new ActivityFilteringProcessor())
+    // .AddProcessor(new ActivityEnrichingProcessor())
+    // .AddProcessor(new ActivityFilteringProcessor())
     .AddConsoleExporter()  //Good idea to comment out when running the orchestrator part
     .AddAzureMonitorTraceExporter(o =>
     {
@@ -48,6 +49,8 @@ using var tracerProvider = OpenTelemetry.Sdk.CreateTracerProviderBuilder()
         };
     })
     .Build();
+
+
 Console.ForegroundColor = ConsoleColor.Green;
 using (var activity = source.StartActivity("CustomTestActivity", ActivityKind.Producer))
 {
@@ -61,8 +64,8 @@ using (var activity = source.StartActivity("CustomTestActivity", ActivityKind.Pr
 }
 
 //Start orchestration of sample server and sample client
-//using var sample = new Orchestrator();
-//sample.Start();
+// using var sample = new Orchestrator();
+// sample.Start();
 
 Console.WriteLine("Press Enter key to exit.");
 Console.ReadLine();
@@ -75,5 +78,5 @@ static string Settings()
 
     var config = configuration.Build();
     var connectionString = config["AppInsights"];
-    return connectionString;
+    return connectionString ?? string.Empty;
 }

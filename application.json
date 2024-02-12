@@ -1,3 +1,3 @@
 {
-  "AppInsights": "<Insert instrumentation key here>"
+  "AppInsights": "InstrumentationKey=0e39cf07-8075-4b11-9ef0-2aedc1bece96;IngestionEndpoint=https://swedencentral-0.in.applicationinsights.azure.com/"
 }
