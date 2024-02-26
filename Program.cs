@@ -22,7 +22,7 @@ using TracerProvider? tracerProvider = OpenTelemetry.Sdk.CreateTracerProviderBui
     .AddSource("Telemetry.AzureMonitor.Demo")
     .AddSource("Telemetry.Samples.SampleServer")
     .AddSource("Telemetry.Samples.SampleClient")
-    // .AddProcessor(new ActivityEnrichingProcessor())
+    // // .AddProcessor(new ActivityEnrichingProcessor())
     // .AddProcessor(new ActivityFilteringProcessor())
     .AddConsoleExporter()  //Good idea to comment out when running the orchestrator part
     .AddAzureMonitorTraceExporter(o =>
