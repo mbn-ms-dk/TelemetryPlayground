@@ -22,9 +22,9 @@ using TracerProvider? tracerProvider = OpenTelemetry.Sdk.CreateTracerProviderBui
     .AddSource("Telemetry.AzureMonitor.Demo")
     .AddSource("Telemetry.Samples.SampleServer")
     .AddSource("Telemetry.Samples.SampleClient")
-    // // .AddProcessor(new ActivityEnrichingProcessor())
-    // .AddProcessor(new ActivityFilteringProcessor())
-    .AddConsoleExporter()  //Good idea to comment out when running the orchestrator part
+    .AddProcessor(new ActivityEnrichingProcessor())
+    .AddProcessor(new ActivityFilteringProcessor())
+    // .AddConsoleExporter()  //Good idea to comment out when running the orchestrator part
     .AddAzureMonitorTraceExporter(o =>
     {
         o.ConnectionString = Settings();
@@ -52,7 +52,7 @@ using TracerProvider? tracerProvider = OpenTelemetry.Sdk.CreateTracerProviderBui
 
 
 Console.ForegroundColor = ConsoleColor.Green;
-using (var activity = source.StartActivity("CustomTestActivity", ActivityKind.Producer))
+using (var activity = source.StartActivity("TD Activity", ActivityKind.Producer))
 {
     activity?.SetTag("CustomTag1", $"Value1");
     activity?.SetTag("CustomTag2", $"Value2");
@@ -64,8 +64,8 @@ using (var activity = source.StartActivity("CustomTestActivity", ActivityKind.Pr
 }
 
 //Start orchestration of sample server and sample client
-// using var sample = new Orchestrator();
-// sample.Start();
+using var sample = new Orchestrator();
+sample.Start();
 
 Console.WriteLine("Press Enter key to exit.");
 Console.ReadLine();

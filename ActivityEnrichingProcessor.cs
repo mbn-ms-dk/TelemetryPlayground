@@ -14,7 +14,7 @@ namespace TelemetryAppInsights
         public override void OnEnd(Activity activity)
         {
             // The updated activity will be available to all processors which are called after this processor.
-            activity.DisplayName = "UpdatedWithActivityProcessor->" + activity.DisplayName;
+            activity.DisplayName = "sendtosalesforce->" + activity.DisplayName;
             activity.SetTag("CustomDimension1", "Value1");
             activity.SetTag("CustomDimension2", "Value2");
             if (activity.Kind == ActivityKind.Server)
