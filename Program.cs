@@ -51,7 +51,7 @@ using TracerProvider? tracerProvider = OpenTelemetry.Sdk.CreateTracerProviderBui
     .Build();
 
 
-Console.ForegroundColor = ConsoleColor.Green;
+Console.ForegroundColor = ConsoleColor.Blue;
 using (var activity = source.StartActivity("TD Activity", ActivityKind.Producer))
 {
     activity?.SetTag("CustomTag1", $"Value1");
